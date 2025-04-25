@@ -18,7 +18,6 @@ void swap(int *a, int *b){
 void main(){
     int x, y;
 
-
     printf("Entre com a variavel 1: ");
     scanf("%d", &x);
     printf("Entre com a variavel 2: ");
