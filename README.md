@@ -3,7 +3,7 @@ Repositório referente aos códigos desenvolvidos na disciplina de Algoritmos e 
 
 ### Árvore de Diretórios
 ```
-    AED1-M2
+AED1-M2
     └───Exercicios
         └───ProgDesc
 ```
