@@ -9,6 +9,7 @@ dinamica de memoria. Em seguida, leia do usuario seus valores e imprima o vetor 
 int main(void){
     int *p;
     int t;
+    
     printf("Qual o tamanho do vetor? ");
     scanf("%d", &t);
 
