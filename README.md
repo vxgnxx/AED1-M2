@@ -5,6 +5,6 @@ Repositório referente aos códigos desenvolvidos, como estudo individual e para
 ```
 AED1-M2
     └─── Exercicios
-        ├───LeetCode
+        ├─── LeetCode
         └─── ProgDesc
 ```
