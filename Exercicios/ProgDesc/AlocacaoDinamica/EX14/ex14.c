@@ -16,8 +16,8 @@ int main(){
     printf("Entre com a dimensao da matriz no eixo Y: ");
     scanf("%d", &axisYS);
 
-    int **matrix = (int **)malloc(axisXS * sizeof(int));
-    for(int i = 0; i < axisYS; i++){
+    int **matrix = (int **)malloc(axisXS * sizeof(int *));
+    for(int i = 0; i < axisXS; i++){
         matrix[i] = (int *)malloc(axisYS * sizeof(int));
     }
 
