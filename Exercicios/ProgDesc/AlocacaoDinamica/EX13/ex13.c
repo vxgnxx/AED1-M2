@@ -7,8 +7,19 @@ valor, retorne 1 caso o valor esteja na matriz ou retorne 0 caso nao esteja na m
 #include <stdio.h>
 #include <stdlib.h>
 
+int find(int target, int **matrix, int axisXS, int axisYS){
+    for (int i = 0; i < axisXS; i++) {
+        for (int j = 0; j < axisYS; j++) {
+            if(target == matrix[i][j]){
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
 int main(){
-    int axisXS, axisYS;
+    int axisXS, axisYS, target;
 
     printf("Entre com a dimensao da matriz no eixo X: ");
     scanf("%d", &axisXS);
@@ -27,12 +38,13 @@ int main(){
         }
     }
 
-    printf("Matriz inserida:\n");
-    for (int i = 0; i < axisXS; i++) {
-        for (int j = 0; j < axisYS; j++) {
-            printf("%d ", matrix[i][j]);
-        }
-        printf("\n");
+    printf("Entre com o alvo: ");
+    scanf("%d", &target);
+
+    if (find(target, matrix, axisXS, axisYS)) {
+        printf("Alvo encontrado!\n");
+    } else {
+        printf("Alvo nao encontrado.\n");
     }
 
     // Liberar a memória
