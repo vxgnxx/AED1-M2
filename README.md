@@ -4,7 +4,9 @@ Repositório referente aos códigos desenvolvidos, como estudo individual e para
 ### Árvore de Diretórios
 ```
 AED1-M2
-    └─── Exercicios
-        ├─── LeetCode
-        └─── ProgDesc
+    ├─── avaliacoes
+    │   └─── exPraticos  
+    └─── exercicios
+        ├─── leetCode
+        └─── progDesc
 ```
