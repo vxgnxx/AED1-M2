@@ -17,7 +17,7 @@ int raizes(float A,float B,float C,float * X1,float * X2);
 
 Essa funcao deve ter como valor de retorno o numero de raizes reais e distintas da
 equacao. Se existirem raizes reais, seus valores devem ser armazenados nas variaveis
-apontadas por X1 e X2.
+apontadas por X1 e X.
 */
 
 #include <stdio.h>

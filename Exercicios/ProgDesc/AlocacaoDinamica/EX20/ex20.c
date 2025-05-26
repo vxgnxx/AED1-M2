@@ -6,7 +6,7 @@ cidades e as armazene em um vetor de estruturas (N e informado pelo usuario);
 (c) Calcule as distancia entre cada duas cidades e armazene na matriz;
 (d) Exiba na tela a matriz de distancias obtida;
 (e) Quando o usuario digitar o numero de duas cidades o programa devera retornar a
-distancia entre elas.
+distancia entre ela.
 */
 
 #include <stdlib.h>
