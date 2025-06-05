@@ -6,8 +6,6 @@
 bool CheckAdjacent_r(char** board, int boardSize, int* boardColSize, char* word, int i, int j, int index);
 bool exist(char** board, int boardSize, int* boardColSize, char* word);
 
-
-
 int main() {
     char* raw_board[] = {
         "ABCE",
@@ -24,7 +22,7 @@ int main() {
         board[i] = strdup(raw_board[i]);
     }
 
-    char word[] = "ABCCED";
+    char word[] = "ASFDA";
 
     if (exist(board, boardSize, boardColSize, word)) {
         printf("The word \"%s\" exists in the board.\n", word);
