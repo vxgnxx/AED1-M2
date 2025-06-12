@@ -60,12 +60,12 @@ int main(){
 void addPerson(void **pBuffer){
     void *p = *pBuffer;
 
-    int  *quantity  = (int *) (p);        // offset 0
-    int  *nameSize  = (int *) (p + 4);    // offset 4
-    int  *age       = (int *) (p + 8);    // offset 8
-    int  *emailSize = (int *) (p + 12);   // offset 12
-    char *tempName  = (char *)(p + 16);   // offset 16
-    char *tempEmail = (char *)(p + 116);  // offset 116
+    int  *quantity  = (int *) p;        // offset 0
+    int  *nameSize  = (int *) p + 4;    // offset 4
+    int  *age       = (int *) p + 8;    // offset 8
+    int  *emailSize = (int *) p + 12;   // offset 12
+    char *tempName  = (char *)p + 16;   // offset 16
+    char *tempEmail = (char *)p + 116;  // offset 116
 
     // Input
     printf("Nome: ");
@@ -85,7 +85,7 @@ void addPerson(void **pBuffer){
 
     int newPersonSize = sizeof(int) + *nameSize + sizeof(int) + sizeof(int) + *emailSize;
     int offset = 216; // Start of person data
-    char *data = (char *)(p + 216);
+    char *data = (char *)p + 216;
 
     for (int i = 0; i < *quantity; i++) {
         int currNameSize = *(int *)data;
@@ -100,12 +100,12 @@ void addPerson(void **pBuffer){
 
     // Update pointers after realloc
     p = *pBuffer;
-    quantity =  (int *) (p);
-    nameSize =  (int *) (p + 4);
-    age =       (int *) (p + 8);
-    emailSize = (int *) (p + 12);
-    tempName =  (char *)(p + 16);
-    tempEmail = (char *)(p + 116);
+    quantity =  (int *) p;
+    nameSize =  (int *) p + 4;
+    age =       (int *) p + 8;
+    emailSize = (int *) p + 12;
+    tempName =  (char *)p + 16;
+    tempEmail = (char *)p + 116;
 
     data = (char *)p + offset;
 
@@ -125,7 +125,7 @@ void addPerson(void **pBuffer){
 }
 
 void removePerson(void **pBuffer){
-
+    
 
 
 }
