@@ -2,22 +2,44 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef int nameSize_t;
-typedef int age_t;
-typedef int emailSize_t;
+// Set of defined names and aliases for better coding and readability
 
-void addPerson(void **pBuffer);
+#define INT_SIZE sizeof(int)
+#define NAME_MAX 100
+#define MAIL_MAX 100
+
+#define MENU_OFFSET 0
+#define COUNT_OFFSET        (MENU_OFFSET          + INT_SIZE)
+#define NAME_SIZE_OFFSET    (COUNT_OFFSET         + INT_SIZE)
+#define AGE_TEMP_OFFSET     (NAME_SIZE_OFFSET     + INT_SIZE)
+#define EMAIL_SIZE_OFFSET   (AGE_TEMP_OFFSET      + INT_SIZE)
+#define TEMP_NAME_OFFSET    (EMAIL_SIZE_OFFSET    + INT_SIZE)
+#define TEMP_MAIL_OFFSET    (TEMP_NAME_OFFSET     + NAME_MAX)
+#define PERSON_SIZE_OFFSET  (TEMP_MAIL_OFFSET     + MAIL_MAX)
+#define TEMP_TRACKER_OFFSET (PERSON_SIZE_OFFSET   + INT_SIZE)
+#define TEMP_INT_OFFSET     (TEMP_TRACKER_OFFSET  + INT_SIZE)
+#define DATA_OFFSET         (TEMP_INT_OFFSET      + INT_SIZE)
+
+// Function prototypes
+
+void AddPerson(void **pBuffer);
+
+// Main function
 
 int main(){
 
-    void *pBuffer = malloc(216);
+    void *pBuffer = malloc(DATA_OFFSET);
     *(int *)pBuffer = 0;
 
-    int *opcao = malloc(sizeof(int));
-    *opcao = 0;
+    
+    int  *totalBufferSize  = (int *)((char *)pBuffer + TEMP_TRACKER_OFFSET);
+    *totalBufferSize = DATA_OFFSET;
+
+    int *option = (int *) pBuffer;
+    *option = 0;
 
     do {
-        printf("\nAGENDA\n");
+        printf("\nA G E N D A\n");
         printf("1- Adicionar Pessoa\n");
         printf("2- Remover Pessoa\n");
         printf("3- Buscar Pessoa\n");
@@ -25,12 +47,12 @@ int main(){
         printf("5- Sair\n");
         printf("Opcao: ");
 
-        scanf("%d", opcao);
+        scanf("%d", option);
         getchar();
         
-        switch (*opcao) {
+        switch (*option) {
             case 1:
-                addPerson(&pBuffer);
+                //addPerson(&pBuffer);
                 printf("\nadd\n");
                 break;
             case 2:
@@ -51,81 +73,66 @@ int main(){
             default:
                 printf("Opcao invalida!\n");
         }
-    } while (*opcao != 5);
+    } while (*option != 5);
 
     free(pBuffer);
     return 0;
 }
+/*
+void AddPerson(void **pBuffer){
+    char *ptr = (char *)*pBuffer;
 
-void addPerson(void **pBuffer){
-    void *p = *pBuffer;
+    int  *quantity         = (int *)(ptr + COUNT_OFFSET);
+    int  *newPersonSize    = (int *)(ptr + PERSON_SIZE_OFFSET);
+    int  *totalBufferSize  = (int *)(ptr + TEMP_TRACKER_OFFSET);
+    int  *nameSize         = (int *)(ptr + NAME_SIZE_OFFSET);
+    int  *age              = (int *)(ptr + AGE_TEMP_OFFSET);
+    int  *emailSize        = (int *)(ptr + EMAIL_SIZE_OFFSET);
+    char *tempName         = (char *)(ptr + TEMP_NAME_OFFSET);
+    char *tempEmail        = (char *)(ptr + TEMP_MAIL_OFFSET);
+    
 
-    int  *quantity  = (int *) p;        // offset 0
-    int  *nameSize  = (int *) p + 4;    // offset 4
-    int  *age       = (int *) p + 8;    // offset 8
-    int  *emailSize = (int *) p + 12;   // offset 12
-    char *tempName  = (char *)p + 16;   // offset 16
-    char *tempEmail = (char *)p + 116;  // offset 116
+    GetPerson(*pBuffer);
 
-    // Input
+    *newPersonSize = *(int *)(ptr + NAME_SIZE_OFFSET) + sizeof(age_t) + *(int *)(ptr + EMAIL_SIZE_OFFSET);
+    char *data = (int *)(ptr + TEMP_INT_OFFSET);
+    
+    for(int i = 0; i < *quantity; i++){
+        int currNameSize = 
+    }
+
+}
+
+
+
+void GetPerson(void *pBuffer){
+    char *ptr = (char *)pBuffer;
+
+    int *newPersonSize = (int *) (ptr + PERSON_SIZE_OFFSET );
+    int *nameSize      = (int *) (ptr + NAME_SIZE_OFFSET   );
+    int *age           = (int *) (ptr + AGE_TEMP_OFFSET    );
+    int *emailSize     = (int *) (ptr + EMAIL_SIZE_OFFSET  );
+    char *tempName     = (char *)(ptr + TEMP_NAME_OFFSET   );
+    char *tempEmail    = (char *)(ptr + TEMP_MAIL_OFFSET   );
+
+    memset(tempName, 0, NAME_MAX);
+    memset(tempEmail, 0, MAIL_MAX);
+
     printf("Nome: ");
-    fgets(tempName, 100, stdin);
+    fgets(tempName, NAME_MAX, stdin);
     tempName[strcspn(tempName, "\n")] = '\0';
+    *nameSize = strlen(tempName) + 1;
 
     printf("Idade: ");
     scanf("%d", age);
-    getchar();
+    getchar();  
 
     printf("Email: ");
-    fgets(tempEmail, 100, stdin);
-    tempEmail[strcspn(tempEmail, "\n")] = '\0';
-
-    *nameSize = strlen(tempName) + 1;
+    fgets(tempEmail, MAIL_MAX, stdin);
+    tempEmail[strcspn(tempEmail, "\n")] = '\0'; 
     *emailSize = strlen(tempEmail) + 1;
 
-    int newPersonSize = sizeof(int) + *nameSize + sizeof(int) + sizeof(int) + *emailSize;
-    int offset = 216; // Start of person data
-    char *data = (char *)p + 216;
-
-    for (int i = 0; i < *quantity; i++) {
-        int currNameSize = *(int *)data;
-        data += sizeof(int) + currNameSize;  // nameSize + name
-        data += sizeof(int);                 // age
-        int currEmailSize = *(int *)data;
-        data += sizeof(int) + currEmailSize; // emailSize + email
-        offset = data - (char *)p;
-    }
-
-    *pBuffer = realloc(*pBuffer, offset + newPersonSize);
-
-    // Update pointers after realloc
-    p = *pBuffer;
-    quantity =  (int *) p;
-    nameSize =  (int *) p + 4;
-    age =       (int *) p + 8;
-    emailSize = (int *) p + 12;
-    tempName =  (char *)p + 16;
-    tempEmail = (char *)p + 116;
-
-    data = (char *)p + offset;
-
-    *(int *)data = *nameSize;
-    data += sizeof(int);
-    memcpy(data, tempName, *nameSize);
-    data += *nameSize;
-
-    *(int *)data = *age;
-    data += sizeof(int);
-
-    *(int *)data = *emailSize;
-    data += sizeof(int);
-    memcpy(data, tempEmail, *emailSize);
-
-    (*quantity)++;
+    *newPersonSize = *nameSize + INT_SIZE + *emailSize + INT_SIZE;
 }
 
-void removePerson(void **pBuffer){
-    
-
-
-}
+*/
