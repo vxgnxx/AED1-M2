@@ -5,6 +5,7 @@ Repositório referente aos códigos desenvolvidos, como estudo individual e para
 ```
 AED1-M2
     ├─── avaliacoes
+    │   ├─── agendaPBuffer 
     │   └─── exPraticos  
     └─── exercicios
         ├─── leetCode
