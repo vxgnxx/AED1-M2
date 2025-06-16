@@ -8,26 +8,47 @@
 #define NAME_MAX 100
 #define MAIL_MAX 100
 
-#define MENU_OFFSET 0                                               //
-#define COUNT_OFFSET          ( MENU_OFFSET           + INT_SIZE )  //
-#define NAME_SIZE_OFFSET      ( COUNT_OFFSET          + INT_SIZE )  //
-#define AGE_TEMP__OFFSET      ( NAME_SIZE_OFFSET      + INT_SIZE )  //
-#define MAIL_SIZE_OFFSET      ( AGE_TEMP__OFFSET      + INT_SIZE )  //
-#define TEMP_NAME_OFFSET      ( MAIL_SIZE_OFFSET      + INT_SIZE )  //
-#define TEMP_MAIL_OFFSET      ( TEMP_NAME_OFFSET      + NAME_MAX )  //
-#define PERSON_SIZE_OFFSET    ( TEMP_MAIL_OFFSET      + MAIL_MAX )  //
-#define BUFFER_TRACKER_OFFSET ( PERSON_SIZE_OFFSET    + INT_SIZE )  //
-#define TEMP_INT1_OFFSET      ( BUFFER_TRACKER_OFFSET + INT_SIZE )  //
-#define TEMP_INT2_OFFSET      ( TEMP_INT1_OFFSET      + INT_SIZE )  //
-#define TEMP_INT3_OFFSET      ( TEMP_INT2_OFFSET      + INT_SIZE )  //
-#define TEMP_INT4_OFFSET      ( TEMP_INT3_OFFSET      + INT_SIZE )  //
-#define TEMP_INT5_OFFSET      ( TEMP_INT4_OFFSET      + INT_SIZE )  //
-#define TEMP_INT6_OFFSET      ( TEMP_INT5_OFFSET      + INT_SIZE )  //
-#define TEMP_INT7_OFFSET      ( TEMP_INT6_OFFSET      + INT_SIZE )  //
-#define DATA_OFFSET           ( TEMP_INT7_OFFSET      + INT_SIZE )  //
+#define MENU_OFFSET 0                                               
+#define COUNT_OFFSET          ( MENU_OFFSET           + INT_SIZE )  
+#define NAME_SIZE_OFFSET      ( COUNT_OFFSET          + INT_SIZE )  
+#define AGE_TEMP__OFFSET      ( NAME_SIZE_OFFSET      + INT_SIZE )  
+#define MAIL_SIZE_OFFSET      ( AGE_TEMP__OFFSET      + INT_SIZE )  
+#define TEMP_NAME_OFFSET      ( MAIL_SIZE_OFFSET      + INT_SIZE )  
+#define TEMP_MAIL_OFFSET      ( TEMP_NAME_OFFSET      + NAME_MAX )  
+#define PERSON_SIZE_OFFSET    ( TEMP_MAIL_OFFSET      + MAIL_MAX )  
+#define BUFFER_TRACKER_OFFSET ( PERSON_SIZE_OFFSET    + INT_SIZE )  
+#define ITERATOR_OFFSET       ( BUFFER_TRACKER_OFFSET + INT_SIZE )  
+#define DATA_TRACKER_OFFSET   ( ITERATOR_OFFSET       + INT_SIZE )  
+#define CS_NAME_OFFSET        ( DATA_TRACKER_OFFSET   + INT_SIZE )  
+#define CS_MAIL_OFFSET        ( CS_NAME_OFFSET        + INT_SIZE )  
+#define BLOCK_SIZE_OFFSET     ( CS_MAIL_OFFSET        + INT_SIZE )  
+#define TO_MOVE_OFFSET        ( BLOCK_SIZE_OFFSET      + INT_SIZE )  
+#define BOOL_OFFSET           ( TO_MOVE_OFFSET      + INT_SIZE )  
+#define DATA_OFFSET           ( BOOL_OFFSET      + INT_SIZE )  
+
+// Global pointers
+
+char *ptr;
+int  *quantity;
+int  *personSize;
+int  *bufferSize;
+int  *iterator;
+int  *currentOffset;
+int  *cNameSize;
+int  *cMailSize;
+int  *toMove;
+int  *found;
+
+int  *age;
+int  *nameSize;
+int  *mailSize;
+int  *blockSize;
+char *tempName;
+char *tempMail;
 
 // Function prototypes
 
+void UpdatePointers( void *pBuffer );
 void AddPerson( void **pBuffer );
 void GetPerson ( void *pBuffer );
 void ListAll( void *pBuffer );
@@ -39,12 +60,12 @@ void SearchPerson( void *pBuffer );
 int main(){
 
     void *pBuffer = malloc( DATA_OFFSET );
-    *( int * )pBuffer = 0;
+    memset(pBuffer, 0, DATA_OFFSET);
 
     
-    int  *totalBufferSize  = ( int * )( ( char * )pBuffer + BUFFER_TRACKER_OFFSET );
-    *totalBufferSize = DATA_OFFSET;
+    UpdatePointers( pBuffer );
 
+    *bufferSize = DATA_OFFSET;
     int *option = ( int * ) pBuffer;
     *option = 0;
 
@@ -98,43 +119,26 @@ int main(){
 */
 
 void AddPerson(void **pBuffer){
-    char *ptr = ( char * )*pBuffer;
-
-    int  *quantity         = ( int * ) ( ptr + COUNT_OFFSET );
-    int  *newPersonSize    = ( int * ) ( ptr + PERSON_SIZE_OFFSET );
-    int  *totalBufferSize  = ( int * ) ( ptr + BUFFER_TRACKER_OFFSET );
-    int  *nameSize         = ( int * ) ( ptr + NAME_SIZE_OFFSET );
-    int  *age              = ( int * ) ( ptr + AGE_TEMP__OFFSET );
-    int  *emailSize        = ( int * ) ( ptr + MAIL_SIZE_OFFSET );
-    char *tempName         = ( char * )( ptr + TEMP_NAME_OFFSET );
-    char *tempEmail        = ( char * )( ptr + TEMP_MAIL_OFFSET );
+    UpdatePointers( *pBuffer );
 
     GetPerson( *pBuffer );
-
-    int *pos          = ( int * )( ptr + TEMP_INT1_OFFSET );
-    int *totalSizePtr = ( int * )( ptr + TEMP_INT2_OFFSET );
     
-    *newPersonSize = *nameSize + INT_SIZE + *emailSize + INT_SIZE;
-    *pos = 0;
-    *totalSizePtr = 0;
-
-    int *nameLen   = ( int * )( ptr + TEMP_INT3_OFFSET );
-    int *emailLen  = ( int * )( ptr + TEMP_INT4_OFFSET );
-    int *blockSize = ( int * )( ptr + TEMP_INT5_OFFSET );
-
-    while( *pos < *quantity ){
-        char *personPtr = ptr + DATA_OFFSET + *totalSizePtr;
+    *personSize = *nameSize + INT_SIZE + *mailSize + INT_SIZE;
+    *iterator = 0;
+    *currentOffset = 0;
+    
+    for(; *iterator < *quantity; ( *iterator )++){
+        char *currentPerson = ptr + DATA_OFFSET + *currentOffset;
         
-        *nameLen = strlen( personPtr ) + 1;
-        *emailLen = strlen( personPtr + *nameLen + INT_SIZE )+1;
-        *blockSize = *( int * )( personPtr + *nameLen + INT_SIZE + *emailLen );
+        *cNameSize = strlen( currentPerson ) + 1;
+        *cMailSize = strlen( currentPerson + *cNameSize + INT_SIZE )+1;
+        *blockSize = *( int * )( currentPerson + *cNameSize + INT_SIZE + *cMailSize );
 
-        *totalSizePtr += *blockSize;
-        ( *pos )++;
+        *currentOffset += *blockSize;
     }
     
-    *totalBufferSize += *newPersonSize;
-    void *newBuffer = realloc( *pBuffer, *totalBufferSize );
+    *bufferSize += *personSize;
+    void *newBuffer = realloc( *pBuffer, *bufferSize );
     if ( newBuffer == NULL ) {
         printf( "Memory reallocation failed!\n" );
         exit( 1 );
@@ -142,61 +146,18 @@ void AddPerson(void **pBuffer){
 
     *pBuffer = newBuffer;
 
-    ptr                  = ( char * )*pBuffer;
-    totalBufferSize      = ( int * )( ptr  + BUFFER_TRACKER_OFFSET );
-    quantity             = ( int * )( ptr  + COUNT_OFFSET );
-    newPersonSize        = ( int * )( ptr  + PERSON_SIZE_OFFSET );
-    totalSizePtr         = ( int * )( ptr  + TEMP_INT2_OFFSET );
-    nameSize             = ( int * )( ptr  + NAME_SIZE_OFFSET );
-    age                  = ( int * )( ptr  + AGE_TEMP__OFFSET );
-    emailSize            = ( int * )( ptr  + MAIL_SIZE_OFFSET );
-    tempName             = ( char * )( ptr + TEMP_NAME_OFFSET );
-    tempEmail            = ( char * )( ptr + TEMP_MAIL_OFFSET );
+    UpdatePointers( *pBuffer );
 
-    char *newPersonPtr   = ptr + DATA_OFFSET + *totalSizePtr;
+    char *newPerson = ptr + DATA_OFFSET + *currentOffset;
 
-    memcpy( newPersonPtr, tempName, *nameSize );
-    memcpy( newPersonPtr + *nameSize, age, INT_SIZE );
-    memcpy( newPersonPtr + *nameSize + INT_SIZE, tempEmail, *emailSize );
-
-    *( int * )( newPersonPtr + *nameSize + INT_SIZE + *emailSize ) = *newPersonSize;
+    memcpy( newPerson, tempName, *nameSize );
+    memcpy( newPerson + *nameSize, age, INT_SIZE );
+    memcpy( newPerson + *nameSize + INT_SIZE, tempMail, *mailSize );
+    
+    // Registra a quantidade de espaço alocado para o registro.
+    *( int * )( newPerson + (*personSize - INT_SIZE) ) = *personSize; 
 
     *quantity += 1;
-}
-
-/*
-==========================================
-    GetPerson
-
-        Armazena o input do usuario
-==========================================
-*/
-
-
-void GetPerson( void *pBuffer ){
-    char *ptr = ( char * )pBuffer;
-    int *nameSize      = ( int * ) ( ptr + NAME_SIZE_OFFSET );
-    int *age           = ( int * ) ( ptr + AGE_TEMP__OFFSET );
-    int *emailSize     = ( int * ) ( ptr + MAIL_SIZE_OFFSET );
-    char *tempName     = ( char * )( ptr + TEMP_NAME_OFFSET );
-    char *tempMail     = ( char * )( ptr + TEMP_MAIL_OFFSET );
-
-    memset( tempName, 0, NAME_MAX );
-    memset( tempMail, 0, MAIL_MAX );
-
-    printf( "\nNome: ");
-    fgets( tempName, NAME_MAX, stdin);
-    tempName[strcspn( tempName, "\n")] = '\0';
-    *nameSize = strlen( tempName) + 1;
-
-    printf( "Idade: ");
-    scanf( "%d", age);
-    getchar();  
-
-    printf( "Email: ");
-    fgets( tempMail, MAIL_MAX, stdin );
-    tempMail[strcspn( tempMail, "\n" )] = '\0'; 
-    *emailSize = strlen( tempMail ) + 1;
 }
 
 /*
@@ -208,39 +169,34 @@ void GetPerson( void *pBuffer ){
 */
 
 void ListAll( void *pBuffer) {
-    char *ptr = ( char * )pBuffer;
 
-    int *quantity      = ( int * )( ptr + COUNT_OFFSET );
-    int *i             = ( int * )( ptr + TEMP_INT4_OFFSET );
-    int *emailLen      = ( int * )( ptr + TEMP_INT3_OFFSET );
-    int *nameLen       = ( int * )( ptr + TEMP_INT2_OFFSET );
-    int *currentOffset = ( int * )( ptr + TEMP_INT1_OFFSET );
+    UpdatePointers( pBuffer );
 
     *currentOffset = 0;
-    *i = 0;
+    *iterator = 0;
 
     if ( *quantity == 0 ) {
         printf( "Nenhuma pessoa cadastrada.\n" );
         return;
     }
 
-    for ( ; *i < *quantity; ( *i )++ ) {
+    for ( ; *iterator < *quantity; ( *iterator )++ ) {
         char *personPtr = ptr + DATA_OFFSET + *currentOffset;
 
-        char *name = personPtr;
-        *nameLen = strlen( name ) + 1;
+        char *cName = personPtr;
+        *cNameSize = strlen( cName ) + 1;
 
-        int *age = ( int * )( personPtr + *nameLen );
+        int *cAge = ( int * )( personPtr + *cNameSize );
 
-        char *email = personPtr + *nameLen + INT_SIZE;
-        *emailLen = strlen( email ) + 1;
+        char *cMail = personPtr + *cNameSize + INT_SIZE;
+        *cMailSize = strlen( cMail ) + 1;
 
-        int *blockSize = ( int * )( personPtr + *nameLen + INT_SIZE + *emailLen );
+        int *blockSize = ( int * )( personPtr + *cNameSize + INT_SIZE + *cMailSize );
 
-        printf( "\nPessoa %d:\n", *i + 1 );
-        printf( "   Nome : %s\n", name );
-        printf( "   Idade: %d\n", *age );
-        printf( "   Email: %s\n", email );
+        printf( "\nPessoa %d:\n", *iterator + 1 );
+        printf( "   Nome : %s\n", cName );
+        printf( "   Idade: %d\n", *cAge );
+        printf( "   Email: %s\n", cMail );
 
         *currentOffset += *blockSize;
     }
@@ -256,40 +212,29 @@ void ListAll( void *pBuffer) {
 */
 
 void RemovePerson( void **pBuffer){
-    char *ptr = ( char * )*pBuffer;
+    UpdatePointers(*pBuffer);
 
-    int *totalBufferSize  = ( int * )( ptr  + BUFFER_TRACKER_OFFSET );
-    int *quantity         = ( int * )( ptr  + COUNT_OFFSET );
-    int *currentOffset    = ( int * )( ptr  + TEMP_INT1_OFFSET );
-    int *i                = ( int * )( ptr  + TEMP_INT2_OFFSET );
-    int *blockSize        = ( int * )( ptr  + TEMP_INT3_OFFSET );
-    int *found            = ( int * )( ptr  + TEMP_INT4_OFFSET );
-    int *emailLen         = ( int * )( ptr  + TEMP_INT5_OFFSET );
-    int *nameLen          = ( int * )( ptr  + TEMP_INT6_OFFSET );
-    int *bytesToMove      = ( int * )( ptr  + TEMP_INT7_OFFSET );
-    char *searchName      = ( char * )( ptr + TEMP_NAME_OFFSET );
-
-    memset( searchName, 0, NAME_MAX );
+    memset( tempName, 0, NAME_MAX );
     *found = 0;
     *currentOffset = 0;
-    *i = 0;
+    *iterator = 0;
 
     printf( "Nome da pessoa a remover: " );
-    fgets( searchName, NAME_MAX, stdin );
-    searchName[strcspn( searchName, "\n" )] = '\0';
+    fgets( tempName, NAME_MAX, stdin );
+    tempName[strcspn( tempName, "\n" )] = '\0';
 
-    for ( ; *i < *quantity; ( *i )++) {
+    for ( ; *iterator < *quantity; ( *iterator )++) {
         char *personPtr = ptr + DATA_OFFSET + *currentOffset;
 
         char *name = personPtr;
-        *nameLen = strlen( name ) + 1;
+        *cNameSize = strlen( name ) + 1;
 
-        char *email = personPtr + *nameLen + INT_SIZE;
-        *emailLen = strlen( email ) + 1;
+        char *email = personPtr + *cNameSize + INT_SIZE;
+        *cMailSize    = strlen( email ) + 1;
 
-        *blockSize = *( int *)( personPtr + *nameLen + INT_SIZE + *emailLen );
+        *blockSize = *( int *)( personPtr + *cNameSize + INT_SIZE + *cMailSize );
 
-        if ( strcmp( name, searchName ) == 0 ) {
+        if ( strcmp( name, tempName ) == 0 ) {
             *found = 1;
             break;
         }
@@ -303,22 +248,25 @@ void RemovePerson( void **pBuffer){
     }
 
     char *start = ptr + DATA_OFFSET + *currentOffset;
-    char *end   = ptr + *totalBufferSize;
-    *bytesToMove = end - ( start + *blockSize );
+    char *end   = ptr + *bufferSize;
+    *toMove = end - ( start + *blockSize );
 
-    memmove( start, start + *blockSize, *bytesToMove );
+    if (*toMove > 0) {
+        memmove(start, start + *blockSize, *toMove);
+    }
 
-    *totalBufferSize -= *blockSize;
+    *bufferSize -= *blockSize;
     *quantity -= 1;
 
-    void *newBuffer = realloc( *pBuffer, *totalBufferSize );
+    void *newBuffer = realloc( *pBuffer, *bufferSize );
     if ( newBuffer == NULL && *quantity > 0 ) {
         printf( "Erro ao realocar memória após remoção!\n" );
         exit( 1 );
     }
 
     *pBuffer = newBuffer;
-    ptr = ( char * )*pBuffer;
+    UpdatePointers( *pBuffer );
+
 }
 
 /*
@@ -329,41 +277,35 @@ void RemovePerson( void **pBuffer){
 */
 
 void SearchPerson( void *pBuffer ){
-    char *ptr = ( char * )pBuffer;
+    
+    UpdatePointers( pBuffer );
 
-    int *quantity       = ( int * )( ptr  + COUNT_OFFSET );
-    int *currentOffset  = ( int * )( ptr  + TEMP_INT1_OFFSET );
-    int *i              = ( int * )( ptr  + TEMP_INT2_OFFSET );
-    int *found          = ( int * )( ptr  + TEMP_INT3_OFFSET );
-    int *blockSize      = ( int * )( ptr  + TEMP_INT4_OFFSET ) ;
-    char *searchName    = ( char * )( ptr + TEMP_NAME_OFFSET );
-
-    memset( searchName, 0, NAME_MAX );
+    memset( tempName, 0, NAME_MAX );
     *currentOffset = 0;
-    *i = 0;
+    *iterator = 0;
     *found = 0;
 
     printf( "\nNome da pessoa a buscar: " );
-    fgets( searchName, NAME_MAX, stdin );
-    searchName[strcspn( searchName, "\n" )] = '\0';
+    fgets( tempName, NAME_MAX, stdin );
+    tempName[strcspn( tempName, "\n" )] = '\0';
 
-    for ( ; *i < *quantity; ( *i )++ ) {
+    for ( ; *iterator < *quantity; ( *iterator )++ ) {
         char *personPtr = ptr + DATA_OFFSET + *currentOffset;
 
-        char *name = personPtr;
-        int nameLen = strlen( name ) + 1;
+        char *cName = personPtr;
+        *cNameSize = strlen( cName ) + 1;
 
-        int *age = ( int * )( personPtr + nameLen );
-        char *email = personPtr + nameLen + INT_SIZE;
-        int emailLen = strlen( email ) + 1;
+        int *age = ( int * )( personPtr + *cNameSize );
+        char *cMail = personPtr + *cNameSize + INT_SIZE;
+        *cMailSize    = strlen( cMail ) + 1;
 
-        *blockSize = *( int * )( personPtr + nameLen + INT_SIZE + emailLen );
+        *blockSize = *( int * )( personPtr + *cNameSize + INT_SIZE + *cMailSize );
 
-        if ( strcmp( name, searchName ) == 0 ) {
+        if ( strcmp( cName, tempName ) == 0 ) {
             printf( "\nPessoa encontrada:\n" );
-            printf( "  Nome : %s\n", name );
+            printf( "  Nome : %s\n", cName );
             printf( "  Idade: %d\n", *age );
-            printf( "  Email: %s\n", email );
+            printf( "  Email: %s\n", cMail );
             *found = 1;
             break;
         }
@@ -374,4 +316,55 @@ void SearchPerson( void *pBuffer ){
     if ( !*found ) {
         printf( "Pessoa não encontrada.\n" );
     }
+}
+
+void UpdatePointers( void *pBuffer ){
+
+    ptr = ( char * )pBuffer;
+
+    quantity         = ( int * )( ptr  + COUNT_OFFSET );
+    personSize       = ( int * )( ptr  + PERSON_SIZE_OFFSET );
+    bufferSize       = ( int * )( ptr + BUFFER_TRACKER_OFFSET );
+    iterator         = ( int * )( ptr + ITERATOR_OFFSET );
+    currentOffset    = ( int * )( ptr + DATA_TRACKER_OFFSET);
+    cNameSize        = ( int * )( ptr + CS_NAME_OFFSET );
+    cMailSize        = ( int * )( ptr + CS_MAIL_OFFSET );
+    blockSize        = ( int * )( ptr + BLOCK_SIZE_OFFSET );
+    toMove           = ( int * )( ptr + TO_MOVE_OFFSET );
+    found            = ( int * )( ptr + BOOL_OFFSET ); 
+
+    // Input Data
+    age              =  ( int * ) ( ptr + AGE_TEMP__OFFSET );
+    nameSize         =  ( int * ) ( ptr + NAME_SIZE_OFFSET );
+    mailSize         =  ( int * ) ( ptr + MAIL_SIZE_OFFSET );
+    tempName         =  ( char * )( ptr + TEMP_NAME_OFFSET );
+    tempMail         =  ( char * )( ptr + TEMP_MAIL_OFFSET );
+}
+
+/*
+==========================================
+    GetPerson
+
+        Armazena o input do usuario
+==========================================
+*/
+
+
+void GetPerson( void *pBuffer ){
+    memset( tempName, 0, NAME_MAX );
+    memset( tempMail, 0, MAIL_MAX );
+
+    printf( "\nNome: ");
+    fgets( tempName, NAME_MAX, stdin);
+    tempName[strcspn( tempName, "\n")] = '\0';
+    *nameSize = strlen( tempName) + 1;
+
+    printf( "Idade: ");
+    scanf( "%d", age);
+    getchar();  
+
+    printf( "Email: ");
+    fgets( tempMail, MAIL_MAX, stdin );
+    tempMail[strcspn( tempMail, "\n" )] = '\0'; 
+    *mailSize = strlen( tempMail ) + 1;
 }
