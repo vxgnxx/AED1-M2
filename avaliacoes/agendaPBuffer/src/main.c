@@ -22,9 +22,9 @@
 #define CS_NAME_OFFSET        ( DATA_TRACKER_OFFSET   + INT_SIZE )  
 #define CS_MAIL_OFFSET        ( CS_NAME_OFFSET        + INT_SIZE )  
 #define BLOCK_SIZE_OFFSET     ( CS_MAIL_OFFSET        + INT_SIZE )  
-#define TO_MOVE_OFFSET        ( BLOCK_SIZE_OFFSET      + INT_SIZE )  
-#define BOOL_OFFSET           ( TO_MOVE_OFFSET      + INT_SIZE )  
-#define DATA_OFFSET           ( BOOL_OFFSET      + INT_SIZE )  
+#define TO_MOVE_OFFSET        ( BLOCK_SIZE_OFFSET     + INT_SIZE )  
+#define BOOL_OFFSET           ( TO_MOVE_OFFSET        + INT_SIZE )  
+#define DATA_OFFSET           ( BOOL_OFFSET           + INT_SIZE )  
 
 // Global pointers
 
