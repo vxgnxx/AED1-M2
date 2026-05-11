@@ -1,6 +1,6 @@
 # Felipe Wagner da Silva ~ AED1-M2
 
-## Agenda
+## Agenda pBuffer
 
 Faça uma agenda com o seguinte menu:
 ```

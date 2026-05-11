@@ -247,6 +247,61 @@ void ListAll( void *pBuffer) {
 }
 
 /*
+============================
+    SearchPerson
+        Busca uma pessoa pelo nome
+============================
+*/
+
+void SearchPerson( void *pBuffer ){
+    char *ptr = ( char * )pBuffer;
+
+    int *quantity       = ( int * )( ptr  + COUNT_OFFSET );
+    int *currentOffset  = ( int * )( ptr  + TEMP_INT1_OFFSET );
+    int *i              = ( int * )( ptr  + TEMP_INT2_OFFSET );
+    int *found          = ( int * )( ptr  + TEMP_INT3_OFFSET );
+    int *blockSize      = ( int * )( ptr  + TEMP_INT4_OFFSET ) ;
+    char *searchName    = ( char * )( ptr + TEMP_NAME_OFFSET );
+
+    memset( searchName, 0, NAME_MAX );
+    *currentOffset = 0;
+    *i = 0;
+    *found = 0;
+
+    printf( "\nNome da pessoa a buscar: " );
+    fgets( searchName, NAME_MAX, stdin );
+    searchName[strcspn( searchName, "\n" )] = '\0';
+
+    for ( ; *i < *quantity; ( *i )++ ) {
+        char *personPtr = ptr + DATA_OFFSET + *currentOffset;
+
+        char *name = personPtr;
+        int nameLen = strlen( name ) + 1;
+
+        int *age = ( int * )( personPtr + nameLen );
+        char *email = personPtr + nameLen + INT_SIZE;
+        int emailLen = strlen( email ) + 1;
+
+        *blockSize = *( int * )( personPtr + nameLen + INT_SIZE + emailLen );
+
+        if ( strcmp( name, searchName ) == 0 ) {
+            printf( "\nPessoa encontrada:\n" );
+            printf( "  Nome : %s\n", name );
+            printf( "  Idade: %d\n", *age );
+            printf( "  Email: %s\n", email );
+            *found = 1;
+            break;
+        }
+
+        *currentOffset += *blockSize;
+    }
+
+    if ( !*found ) {
+        printf( "Pessoa não encontrada.\n" );
+    }
+}
+
+/*
 ========================
     RemovePerson
         Remove a pessoa através de seu nome
@@ -319,59 +374,4 @@ void RemovePerson( void **pBuffer){
 
     *pBuffer = newBuffer;
     ptr = ( char * )*pBuffer;
-}
-
-/*
-============================
-    SearchPerson
-        Busca uma pessoa pelo nome
-============================
-*/
-
-void SearchPerson( void *pBuffer ){
-    char *ptr = ( char * )pBuffer;
-
-    int *quantity       = ( int * )( ptr  + COUNT_OFFSET );
-    int *currentOffset  = ( int * )( ptr  + TEMP_INT1_OFFSET );
-    int *i              = ( int * )( ptr  + TEMP_INT2_OFFSET );
-    int *found          = ( int * )( ptr  + TEMP_INT3_OFFSET );
-    int *blockSize      = ( int * )( ptr  + TEMP_INT4_OFFSET ) ;
-    char *searchName    = ( char * )( ptr + TEMP_NAME_OFFSET );
-
-    memset( searchName, 0, NAME_MAX );
-    *currentOffset = 0;
-    *i = 0;
-    *found = 0;
-
-    printf( "\nNome da pessoa a buscar: " );
-    fgets( searchName, NAME_MAX, stdin );
-    searchName[strcspn( searchName, "\n" )] = '\0';
-
-    for ( ; *i < *quantity; ( *i )++ ) {
-        char *personPtr = ptr + DATA_OFFSET + *currentOffset;
-
-        char *name = personPtr;
-        int nameLen = strlen( name ) + 1;
-
-        int *age = ( int * )( personPtr + nameLen );
-        char *email = personPtr + nameLen + INT_SIZE;
-        int emailLen = strlen( email ) + 1;
-
-        *blockSize = *( int * )( personPtr + nameLen + INT_SIZE + emailLen );
-
-        if ( strcmp( name, searchName ) == 0 ) {
-            printf( "\nPessoa encontrada:\n" );
-            printf( "  Nome : %s\n", name );
-            printf( "  Idade: %d\n", *age );
-            printf( "  Email: %s\n", email );
-            *found = 1;
-            break;
-        }
-
-        *currentOffset += *blockSize;
-    }
-
-    if ( !*found ) {
-        printf( "Pessoa não encontrada.\n" );
-    }
 }
